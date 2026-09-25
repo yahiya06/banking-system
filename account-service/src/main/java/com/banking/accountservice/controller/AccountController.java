@@ -37,4 +37,28 @@ public class AccountController {
         accountService.blockAccount(accountNumber);
         return ResponseEntity.ok("Account blocked successfully");
     }
+    /**
+     * SAGA STEP 1: DEDUCT BALANCE
+     * CALLED BY TRANSECTION SERVICE WHEN TRANSFER IS INITIATED
+     */
+
+    @PutMapping("/{accountNumber}/deduct")
+    public ResponseEntity<String> deductBalance(@PathVariable String accountNumber,@RequestParam BigDecimal amount){
+        accountService.deductBalance(accountNumber, amount);
+        return ResponseEntity.ok("Balance deducted successfully");
+    }
+
+    /**
+     * SAGA STEP 2: Compensating transection endpoint
+     * Called by transection service in two scenario
+     * 1. if fraud detected refund sender (undo step 1)
+     * 2. transection completed credit to receiver
+     */
+
+    @PutMapping("/{accountNumber}/credit")
+    public ResponseEntity<String> creditBalance(@PathVariable String accountNumber, @RequestParam BigDecimal amount){
+        accountService.creditBalance(accountNumber,amount);
+        return ResponseEntity.ok("Balance credit successfully");
+    }
+
 }
