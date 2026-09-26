@@ -77,7 +77,13 @@ public class AccountService {
      * @param accountNumber
      */
     public void blockAccount(String accountNumber){
-
+        log.info("Blocking account: {}",accountNumber );
+        Account account = accountRepository.getByAccountNumber(accountNumber).orElseThrow(
+                ()-> new RuntimeException("Account not found")
+        );
+        account.setAccountStatus(AccountStatus.BLOCKED);
+        accountRepository.save(account);
+        log.info("Account blocked: {}",accountNumber);
     }
 
     private String generateAccountNumber(){
