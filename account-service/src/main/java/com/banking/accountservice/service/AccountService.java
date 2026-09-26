@@ -47,6 +47,11 @@ public class AccountService {
         return mapToResponse(savedAccount);
     }
 
+    /**
+     * get account by number
+     * @param accountNumber
+     * @return
+     */
     public AccountResponse getAccount(String accountNumber){
         Account account = accountRepository.getByAccountNumber(accountNumber).orElseThrow(
                 () ->new RuntimeException("Account not found")
@@ -54,6 +59,11 @@ public class AccountService {
         return mapToResponse(account);
     }
 
+    /**
+     * get account balance
+     * @param accountNumber
+     * @return
+     */
     public BigDecimal getBalance(String accountNumber){
         Account account = accountRepository.getByAccountNumber(accountNumber).orElseThrow(
                 () -> new RuntimeException("Account not found")
@@ -62,6 +72,13 @@ public class AccountService {
         return account.getBalance();
     }
 
+    /**
+     * Block account - Called By fraud detection service by kafka
+     * @param accountNumber
+     */
+    public void blockAccount(String accountNumber){
+
+    }
 
     private String generateAccountNumber(){
         String accountNumber;
