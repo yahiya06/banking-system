@@ -47,6 +47,20 @@ public class AccountService {
         return mapToResponse(savedAccount);
     }
 
+    public AccountResponse getAccount(String accountNumber){
+        Account account = accountRepository.getByAccountNumber(accountNumber).orElseThrow(
+                () ->new RuntimeException("Account not found")
+        );
+        return mapToResponse(account);
+    }
+
+    public BigDecimal getBalance(String accountNumber){
+        Account account = accountRepository.getByAccountNumber(accountNumber).orElseThrow(
+                () -> new RuntimeException("Account not found")
+        );
+
+        return account.getBalance();
+    }
 
 
     private String generateAccountNumber(){
