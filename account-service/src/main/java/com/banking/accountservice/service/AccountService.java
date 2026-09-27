@@ -86,6 +86,39 @@ public class AccountService {
         log.info("Account blocked: {}",accountNumber);
     }
 
+    public void deductBalance(String accountNumber, BigDecimal amount){
+        log.info("Deducting balance {} from account {}", amount ,accountNumber);
+        Account account = accountRepository.getByAccountNumber(accountNumber).orElseThrow(
+                ()-> new RuntimeException("Account not found")
+        );
+
+        if (account.getAccountStatus()!= AccountStatus.ACTIVE){
+            throw new RuntimeException("Account not active:"+ accountNumber);
+        }
+
+        if (account.getBalance().compareTo(amount) < 0){
+            throw new RuntimeException("Insufficient fund for account:"+ accountNumber);
+        }
+
+        account.setBalance(account.getBalance().subtract(amount));
+        accountRepository.save(account);
+        log.info("Balance Updated, new balance is {}", account.getBalance());
+    }
+
+    /**
+     * Credit method called by transection service by kafka
+     * @return
+     */
+    public void creditBalance(String accountNumber, BigDecimal amount){
+        Account account = accountRepository.getByAccountNumber(accountNumber).orElseThrow(
+                ()-> new RuntimeException("Account not found ")
+        );
+
+        account.setBalance(account.getBalance().add(amount));
+        accountRepository.save(account);
+        log.info("Balance credited. new balance {}", account.getBalance());
+    }
+
     private String generateAccountNumber(){
         String accountNumber;
 
