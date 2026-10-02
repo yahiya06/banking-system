@@ -2,21 +2,33 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
-      <profile name="Annotation profile for fraud-detection-service" enabled="true">
+      <profile name="Annotation profile for payment-service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
+        </processorPath>
+        <module name="api-gateway" />
+        <module name="payment-service" />
+        <module name="account-service" />
+        <module name="notification-service" />
+        <module name="fraud-detection-service" />
+      </profile>
+      <profile name="Annotation profile for transection-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
         </processorPath>
-        <module name="api-gateway" />
-        <module name="payment-service" />
         <module name="transection-service" />
-        <module name="account-service" />
-        <module name="notification-service" />
-        <module name="fraud-detection-service" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="transaction-service" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
@@ -25,6 +37,7 @@
       <module name="fraud-detection-service" options="-parameters" />
       <module name="notification-service" options="-parameters" />
       <module name="payment-service" options="-parameters" />
+      <module name="transaction-service" options="-parameters" />
       <module name="transection-service" options="-parameters" />
     </option>
   </component>
