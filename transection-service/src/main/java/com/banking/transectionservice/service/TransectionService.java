@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -77,6 +78,12 @@ public class TransectionService {
     }
 
     public List<TransectionResponse> getTransectionHistory(String accountNumber) {
+
+        return transectionRepository
+                .findBySenderAccountNumberOrderByCreatedAtDesc(accountNumber)
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 
 
