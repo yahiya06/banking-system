@@ -19,7 +19,7 @@ public class Transection {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private int id;
+    private String id;
 
     @Column(nullable = false)
     private String senderAccountNumber;
