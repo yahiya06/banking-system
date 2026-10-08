@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TransectionResponse {
-    private int id;
+    private String id;
     private String senderAccountNumber;
     private String receiverAccountNumber;
     private BigDecimal amount;

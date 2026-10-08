@@ -68,6 +68,23 @@ public class TransectionService {
         return mapToResponse(savedTransection);
     }
 
+    private TransectionResponse mapToResponse(Transection transection){
 
+        TransectionResponse response = new TransectionResponse();
+
+        response.setId(transection.getId());
+        response.setSenderAccountNumber(transection.getSenderAccountNumber());
+        response.setReceiverAccountNumber(transection.getReceiverAccountNumber());
+        response.setAmount(transection.getAmount());
+        response.setType(transection.getType());
+        response.setStatus(transection.getStatus());
+        response.setDescription(transection.getDescription());
+        response.setReferenceNumber(transection.getReferenceNumber());
+        response.setFailureReason(transection.getFailureReason());
+        response.setCreatedAt(transection.getCreatedAt());
+        response.setCompletedAt(transection.getCompletedAt());
+
+        return response;
+    }
 
 }
