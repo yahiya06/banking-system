@@ -27,12 +27,12 @@ public class TransectionController {
     }
 
     @GetMapping("/{transectionId}")
-    public ResponseEntity<List<TransectionResponse>> getTransection(@PathVariable String transectionId){
+    public ResponseEntity<TransectionResponse> getTransection(@PathVariable String transectionId){
         return ResponseEntity.ok(transectionService.getTransection(transectionId));
     }
 
     @GetMapping("/account/{accountNumber}")
-    public ResponseEntity<TransectionResponse> getTransectionHistory(@PathVariable String accountNumber){
+    public ResponseEntity<List<TransectionResponse>> getTransectionHistory(@PathVariable String accountNumber){
         return ResponseEntity.ok(transectionService.getTransectionHistory(accountNumber));
     }
 

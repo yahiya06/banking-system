@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -67,6 +68,17 @@ public class TransectionService {
 
         return mapToResponse(savedTransection);
     }
+
+    public TransectionResponse getTransection(String transectionId) {
+        return mapToResponse(transectionRepository
+                .findById(transectionId)
+                .orElseThrow(()-> new RuntimeException("Transection not found"+transectionId))
+        );
+    }
+
+    public List<TransectionResponse> getTransectionHistory(String accountNumber) {
+    }
+
 
     private TransectionResponse mapToResponse(Transection transection){
 
