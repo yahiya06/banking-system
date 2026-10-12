@@ -13,7 +13,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class FraudDetectionEventConsumer {
 
-    private FraudDetectionService fraudDetectionService;
+    private final FraudDetectionService fraudDetectionService;
 
     @KafkaListener(topics = "transection.initiated", groupId = "fraud-detection-group")
     public void consumeTransectionInitiated(@Payload Map<String, Object> payload){
