@@ -32,7 +32,7 @@ public class FraudDetectionService {
 
         log.info("checking taransection: {} account: {} amount: {} balance: {}", transectionId, accountNumber,amount, senderBalance);
 
-        FraudCheckResult result = performFraudChech(accountNumber,amount,senderBalance);
+        FraudCheckResult result = performFraudCheck(accountNumber,amount,senderBalance);
 
         if (result.isFraud()){
             log.info("Suspicious activity detected- account; {} reason: {}- requesting otp verification",accountNumber,result.getReason());
@@ -54,7 +54,9 @@ public class FraudDetectionService {
 
             kafkaTemplate.send(FRAUD_CHECK_CLEAN_RESULT_TOPIC,transectionId,transectionCleanEvent);
         }
+    }
 
+    private FraudCheckResult performFraudCheck(String accountNumber, BigDecimal amount, BigDecimal senderBalance){
 
     }
 }
