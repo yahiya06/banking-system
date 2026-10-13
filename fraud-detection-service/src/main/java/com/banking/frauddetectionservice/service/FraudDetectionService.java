@@ -58,5 +58,25 @@ public class FraudDetectionService {
 
     private FraudCheckResult performFraudCheck(String accountNumber, BigDecimal amount, BigDecimal senderBalance){
 
+        //pattern 1 : velocity check
+        if (isVelocityExceeded(accountNumber)){
+            return new FraudCheckResult(true,"Too many transection in 60 second velocity exceeded");
+        }
+
+        //pattern : amount check
+        if (isAmounySuspicious(accountNumber,amount)){
+            return new FraudCheckResult(true,"Unusual transection amount exceeded 3x your average");
+        }
+
+        //pattern 3 : balance check
+        if (senderBalance.compareTo(BigDecimal.ZERO) >0 && isBalanceCheckFailed(accountNumber,amount)){
+            return new FraudCheckResult(true,"Transection exceed 90% of your account balance");
+        }
+
+        return new FraudCheckResult(false,null);
+    }
+
+    private boolean isVelocityExceeded(String accountNumber){
+
     }
 }
