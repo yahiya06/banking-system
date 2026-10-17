@@ -6,6 +6,7 @@ import com.banking.transectionservice.dto.TransectionResponse;
 import com.banking.transectionservice.entity.Transection;
 import com.banking.transectionservice.entity.TransectionStatus;
 import com.banking.transectionservice.entity.TransectionType;
+import com.banking.transectionservice.event.TransectionCompletedEvent;
 import com.banking.transectionservice.event.TransectionInitiatedEvent;
 import com.banking.transectionservice.repository.TransectionRepository;
 import jakarta.validation.Valid;
@@ -15,7 +16,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -32,6 +36,7 @@ public class TransectionService {
     private static final String TRANSECTION_INITIATED_TOPIC = "transection.initiated";
     private static final String TRANSECTION_COMPLETED_TOPIC = "transection.completed";
     private static final String TRANSECTION_REFUNDED_TOPIC = "transection.refunded";
+    private static final String FRAUD_DETECTED_TOPIC = "fraud.deteted";
 
 
     public TransectionResponse transfer(@Valid TransectionRequest request) {
@@ -118,6 +123,62 @@ public class TransectionService {
         redisTemplate.delete(otpKey);
         completeTransection(transection);
         return mapToResponse(transection);
+    }
+
+    private void compensateTransection(Transection transection, String reason){
+        log.warn("SAGA COMPENSATION - refunding: {}, amount: {}",transection.getSenderAccountNumber(),transection.getAmount());
+
+        //CREDIT MONEY BACK TO SENDER SYNCHRONOUSLY
+        accountServiceClient.creditBalance(transection.getSenderAccountNumber(),transection.getAmount());
+        transection.setStatus(TransectionStatus.FLAGGED);
+        transection.setFailureReason(reason + " - SAGA Compensation executed, amount refunded at"+ LocalDateTime.now());
+
+        transectionRepository.save(transection);
+
+        //PUBLISH refund event - Notification service will alert user
+        Map<String,Object> refundEvent = new HashMap<>();
+        refundEvent.put("transectionId",transection.getId());
+        refundEvent.put("SenderAccountNumber",transection.getSenderAccountNumber());
+        refundEvent.put("amount",transection.getAmount());
+        refundEvent.put("reason",reason);
+
+        kafkaTemplate.send(TRANSECTION_REFUNDED_TOPIC,transection.getId(),refundEvent);
+
+        log.info("SAGA COMPENSATION COMPLETED - {} refunded to {}",transection.getAmount(),transection.getSenderAccountNumber());
+    }
+
+    private void blockAccountAndCompensate(Transection transection, String reason){
+        //publish fraud.detected -> account service will block account
+        Map<String, Object> fraudEvent = new HashMap<>();
+        fraudEvent.put("transectionId",transection.getId());
+        fraudEvent.put("accountNumber", transection.getSenderAccountNumber());
+        fraudEvent.put("reason",reason);
+
+        kafkaTemplate.send(FRAUD_DETECTED_TOPIC, transection.getSenderAccountNumber(), fraudEvent);
+
+        log.warn("fraud.detected published - account {} will be blocked, Kindly contact to the bank",transection.getSenderAccountNumber());
+
+        //SAGA COMPENSATION - refund sender
+        compensateTransection(transection,reason);
+    }
+
+    private void completeTransection(Transection transection){
+        transection.setStatus(TransectionStatus.COMPLETED);
+        transection.setCompletedAt(LocalDateTime.now());
+        transectionRepository.save(transection);
+
+        TransectionCompletedEvent completedEvent = new TransectionCompletedEvent(
+                transection.getId(),
+                transection.getSenderAccountNumber(),
+                transection.getReceiverAccountNumber(),
+                transection.getAmount(),
+                transection.getDescription()
+        );
+
+        kafkaTemplate.send(TRANSECTION_COMPLETED_TOPIC,transection.getId(),completedEvent);
+
+        log.warn("SAGA COMPLETED - transection {} completed",transection.getId());
+
     }
 
     private TransectionResponse mapToResponse(Transection transection){
