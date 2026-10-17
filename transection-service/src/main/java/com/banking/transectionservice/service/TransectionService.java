@@ -11,6 +11,7 @@ import com.banking.transectionservice.repository.TransectionRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,7 @@ public class TransectionService {
     private final AccountServiceClient accountServiceClient;
 
     private final KafkaTemplate<String,Object> kafkaTemplate;
+    private final RedisTemplate<String,String> redisTemplate;
 
     private static final String TRANSECTION_INITIATED_TOPIC = "transection.initiated";
     private static final String TRANSECTION_COMPLETED_TOPIC = "transection.completed";
@@ -86,6 +88,37 @@ public class TransectionService {
                 .collect(Collectors.toList());
     }
 
+    public TransectionResponse verifyOTP(String transectionId, String otp){
+        log.info("OTP verification for the transection {}",transectionId);
+
+        Transection transection = transectionRepository.findById(transectionId)
+                .orElseThrow(()-> new RuntimeException("Transection not found"+transectionId));
+
+        String otpKey = "transection:otp" +transectionId;
+        String storedOtp = redisTemplate.opsForValue().get(otpKey);
+
+        //OTP expired
+        if (storedOtp == null){
+            log.warn("OTP expired for transection: {}", transectionId);
+            compensateTransection(transection,"OTP expired - transection cancelled and amount refunded");
+            return mapToResponse(transection);
+        }
+
+        //Wrong otp Blocking account and refund
+        if (!storedOtp.equals(otp)){
+            log.warn("Wrong OTP - blocking account and refunding {}",transectionId);
+            redisTemplate.delete(otpKey);
+            blockAccountAndCompensate(transection,"Wrong OTP entered - transection cancelled, " +
+                    "account blocking for security");
+            return mapToResponse(transection);
+        }
+
+        //OTP correct - complete transection
+        log.info("OTP verified - completing transection: {}",transectionId);
+        redisTemplate.delete(otpKey);
+        completeTransection(transection);
+        return mapToResponse(transection);
+    }
 
     private TransectionResponse mapToResponse(Transection transection){
 
