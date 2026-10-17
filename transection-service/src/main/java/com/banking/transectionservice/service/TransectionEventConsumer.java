@@ -6,6 +6,7 @@ import com.banking.transectionservice.repository.TransectionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ public class TransectionEventConsumer {
 
     private static final String TRANSECTION_OTP_GENERATED_TOPIC = "transection.otp.generated";
 
+    @KafkaListener(topics = "verification.required")
     public void consumeVerificationRequired(@Payload Map<String,Object> payload){
         try{
             String transectionId = (String) payload.get("transectionId");
