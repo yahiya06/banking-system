@@ -41,7 +41,6 @@ public class FraudDetectionService {
         String accountNumber = (String) payload.get("senderAccountNumber");
         BigDecimal amount = new BigDecimal(payload.get("amount").toString());
 
-
         BigDecimal senderBalance = accountServiceClient.getBalance(accountNumber);
 
         log.info("checking taransection: {} account: {} amount: {} balance: {}", transectionId, accountNumber,amount, senderBalance);

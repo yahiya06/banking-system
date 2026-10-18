@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 public class TransectionEventConsumer {
 
     private final TransectionRepository transectionRepository;
+    private final TransectionService transectionService;
     private final RedisTemplate<String,String> redisTemplate;
     private static final long OTP_EXPIRY_MINUTES = 5;
 
@@ -71,7 +72,16 @@ public class TransectionEventConsumer {
         } catch (Exception e) {
             log.error("Error handling verification required: {}",e.getMessage());
         }
+    }
 
+    @KafkaListener(topics = "fraud.check.clean")
+    public void consumeFraudCheckCleanResult(@Payload Map<String,Object> payload){
+        try{
+            String transectionId = (String) payload.get("transectionId");
+            transectionService.processCleanResult(transectionId);
+        } catch (Exception e) {
+            log.error("Error processing fraud check result: {}",e.getMessage());
+        }
     }
 
 

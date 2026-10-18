@@ -181,6 +181,17 @@ public class TransectionService {
 
     }
 
+    public void processCleanResult(String transectionId){
+        Transection transection = transectionRepository.findById(transectionId)
+                .orElseThrow(()-> new RuntimeException("Transection not found"+transectionId));
+
+        if (transection.getStatus() != TransectionStatus.PROCESSING){
+            log.warn("Transection {} not processing - skipping",transectionId);
+            return;
+        }
+        completeTransection(transection);
+    }
+
     private TransectionResponse mapToResponse(Transection transection){
 
         TransectionResponse response = new TransectionResponse();
