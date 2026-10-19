@@ -126,6 +126,42 @@ public class PaymentService {
         } catch (Exception e) {
             log.error("Error handling payment success: {}",e.getMessage());
         }
+    }
 
+    private void handlePaymentFailure(Map<String,Object> payload){
+        try{
+            Map<String,Object> paymentData = extractPaymentData(payload);
+
+            String orderId = (String) paymentData.get("order_id");
+
+            Payment payment = paymentRepository.findByRazorpayOrderId(orderId)
+                    .orElseThrow(()->new RuntimeException("Payment not found for order"+orderId));
+
+            payment.setStatus(PaymentStatus.FAILED);
+            payment.setFailureReason("Payment failed via Razorpay");
+            paymentRepository.save(payment);
+
+            //Publish payment completed event
+            Map<String,Object> event = new HashMap<>();
+            event.put("paymentId",payment.getId());
+            event.put("accountNumber",payment.getAccountNumber());
+            event.put("amount",payment.getAmount());
+            event.put("reason","Payment failed via Razorpay");
+
+            kafkaTemplate.send(PAYMENT_FAILED_TOPICS,payment.getId(),event);
+
+            log.warn("Payment failed: {}",payment.getId());
+
+        } catch (Exception e) {
+            log.error("Error handling payment failure: {}",e.getMessage());
+        }
+    }
+
+    private Map<String, Object> extractPaymentData(Map<String, Object> payload) {
+        Map<String,Object> entity = (Map<String, Object>) payload.get("payload");
+
+        Map<String,Object> paymentWrapper = (Map<String, Object>) entity.get("payment");
+
+        return (Map<String, Object>) paymentWrapper.get("entity");
     }
 }
