@@ -5,7 +5,7 @@ spring:
     url: jdbc:mysql://localhost:3306/payment_db?createDatabaseIfNotExist=true
     username: root
     password: root
-    driver-class-name: com.jdbc.cj.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
       ddl-auto: update
@@ -17,7 +17,7 @@ spring:
     bootstrap-servers: localhost:9902
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
 
 server:
   port: 8083

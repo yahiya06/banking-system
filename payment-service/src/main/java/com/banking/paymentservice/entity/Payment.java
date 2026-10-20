@@ -37,11 +37,11 @@ public class Payment {
 
     private String description;
 
-    @CreationTimestamp
     private String failureReason;
-    @UpdateTimestamp
-    private LocalDateTime createdAt;
 
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
 }

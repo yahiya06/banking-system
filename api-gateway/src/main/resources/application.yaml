@@ -7,44 +7,41 @@ spring:
       port: 6379
   cloud:
     gateway:
-      routes:
+      server:
+        webflux:
+          routes:
+            - id: account-service
+              uri: http://localhost:8081
+              predicates:
+                - Path=/api/v1/accounts/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 10
+                    redis-rate-limiter.burstCapacity: 20
 
-        # Account service routes
-        - id: account-service
-          uri: http://localhost:8081
-          predicates:
-            - Path=/api/v1/account/**
-          filters:
-            - name: RequestRateLimiter
-              args:
-                redis-rate-limiter.replenishRate: 10
-                redis-rate-limiter.burstCapacity: 20
+            - id: transection-service
+              uri: http://localhost:8082
+              predicates:
+                - Path=/api/v1/transections/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 10
+                    redis-rate-limiter.burstCapacity: 20
 
-        # Transection service routes
-        - id: transection-service
-          uri: http://localhost:8082
-          predicates:
-            - Path=/api/v1/transections/**
-          filters:
-            - name: RequestRateLimiter
-              args:
-                redis-rate-limiter.replenishRate: 10
-                redis-rate-limiter.burstCapacity: 20
-
-        # Payment service routes
-        - id: payment-service
-          uri: http://localhost:8082
-          predicates:
-            - Path=/api/v1/payments/**
-          filters:
-            - name: RequestRateLimiter
-              args:
-                redis-rate-limiter.replenishRate: 5
-                redis-rate-limiter.burstCapacity: 10
-
+            - id: payment-service
+              uri: http://localhost:8083
+              predicates:
+                - Path=/api/v1/payments/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 5
+                    redis-rate-limiter.burstCapacity: 10
 
 server:
-  port; 8080
+  port: 8080
 
 management:
   endpoints:
