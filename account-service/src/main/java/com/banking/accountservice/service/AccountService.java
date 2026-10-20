@@ -6,7 +6,6 @@ import com.banking.accountservice.entity.Account;
 import com.banking.accountservice.entity.AccountStatus;
 import com.banking.accountservice.entity.AccountType;
 import com.banking.accountservice.repository.AccountRepository;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,6 @@ import java.security.SecureRandom;
 
 @Service
 @Slf4j
-@AllArgsConstructor
 @RequiredArgsConstructor
 public class AccountService {
     private final AccountRepository accountRepository;

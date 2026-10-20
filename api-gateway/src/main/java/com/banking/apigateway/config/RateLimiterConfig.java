@@ -1,4 +1,4 @@
-package config;
+package com.banking.apigateway.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
