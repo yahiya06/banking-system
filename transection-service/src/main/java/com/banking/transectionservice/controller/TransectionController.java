@@ -36,6 +36,7 @@ public class TransectionController {
         return ResponseEntity.ok(transectionService.getTransectionHistory(accountNumber));
     }
 
+    @PostMapping("/{transectionId}/verify")
     public ResponseEntity<TransectionResponse> verifyOTP(@PathVariable String transectionId, @RequestParam String otp){
         log.info("OTP verification request - transection {}",transectionId);
 

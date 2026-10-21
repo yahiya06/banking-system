@@ -28,7 +28,8 @@ public class NotificationService {
                              "Reason %s" +
                               "A transection of %s is pending verification. " +
                               "Your otp is %s. Valid for 5 minutes. " +
-                              "If this wasn't you - ignore this message."
+                              "If this wasn't you - ignore this message.",
+                                reason,amount,otp
                     )
             );
         } catch (Exception e) {
@@ -48,7 +49,7 @@ public class NotificationService {
             sendAlert(senderAccount,"DEBIT ALERT", String.format("%s debited from account %s",amount,senderAccount));
 
             //Credit alert
-            sendAlert(receiverAccount,"CREDIT ALERT", String.format("%s credited from account %s",amount,receiverAccount));
+            sendAlert(receiverAccount,"CREDIT ALERT", String.format("%s credited to account %s",amount,receiverAccount));
         } catch (Exception e) {
             log.error("Error sending transection notification: {}",e.getMessage());
         }
