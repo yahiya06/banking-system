@@ -47,7 +47,7 @@ public class TransectionService {
         );
 
         accountServiceClient.deductBalance(
-                request.getReceiverAccountNumber(),
+                request.getSenderAccountNumber(),
                 request.getAmount());
 
         Transection transection = new Transection();
@@ -72,7 +72,7 @@ public class TransectionService {
         );
 
         kafkaTemplate.send(TRANSECTION_INITIATED_TOPIC, savedTransection.getId(), event);
-        log.info("TransectionInitiatedEvent published: {}", savedTransection.getId());
+        log.info("SAGA STEP 2- TransectionInitiatedEvent published: {}", savedTransection.getId());
 
         return mapToResponse(savedTransection);
     }

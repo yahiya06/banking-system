@@ -34,7 +34,7 @@ public class FraudDetectionService {
     private double maxBalancePercentage;
 
     private static final String VERIFICATION_REQUIRED_TOPIC="verification.required";
-    private static final String FRAUD_CHECK_CLEAN_RESULT_TOPIC="verification.required";
+    private static final String FRAUD_CHECK_CLEAN_RESULT_TOPIC="fraud.check.clean";
 
     public void checkTransection(Map<String, Object> payload) {
         String transectionId = (String) payload.get("transectionId");
@@ -43,7 +43,7 @@ public class FraudDetectionService {
 
         BigDecimal senderBalance = accountServiceClient.getBalance(accountNumber);
 
-        log.info("checking taransection: {} account: {} amount: {} balance: {}", transectionId, accountNumber,amount, senderBalance);
+        log.info("checking transection: {} account: {} amount: {} balance: {}", transectionId, accountNumber,amount, senderBalance);
 
         FraudCheckResult result = performFraudCheck(accountNumber,amount,senderBalance);
 
@@ -62,7 +62,7 @@ public class FraudDetectionService {
 
             Map<String,Object> transectionCleanEvent = new HashMap<>();
             transectionCleanEvent.put("transectionId",transectionId);
-            transectionCleanEvent.put("isfraud", false);
+            transectionCleanEvent.put("isFraud", false);
             transectionCleanEvent.put("reason",null);
 
             kafkaTemplate.send(FRAUD_CHECK_CLEAN_RESULT_TOPIC,transectionId,transectionCleanEvent);

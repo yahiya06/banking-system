@@ -22,7 +22,7 @@ public class FraudDetectionEventConsumer {
         try {
             fraudDetectionService.checkTransection(payload);
         }catch (Exception e){
-
+            log.error("Error in fraud detection: {}",e.getMessage());
         }
     }
 }
